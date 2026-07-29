@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ea580c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Pata Hai?">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Pata Hai?</title>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <span class="app-logo">📰 Pata Hai?</span>
+    <span class="app-date" id="app-date"></span>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="app-main" id="app-main">
+
+    <!-- Skeleton (shown while loading) -->
+    <div class="skeleton-screen" id="skeleton">
+      <div class="skeleton-card">
+        <div class="skeleton-line wide"></div>
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line narrow"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line wide"></div>
+        <div class="skeleton-line medium"></div>
+      </div>
+    </div>
+
+    <!-- Section panels (hidden until data loads) -->
+    <div class="section-panel hidden" id="panel-world"></div>
+    <div class="section-panel hidden" id="panel-economy"></div>
+    <div class="section-panel hidden" id="panel-culture"></div>
+    <div class="section-panel hidden" id="panel-person"></div>
+    <div class="section-panel hidden" id="panel-topic5"></div>
+    <div class="section-panel hidden" id="panel-quiz"></div>
+
+    <!-- Offline message -->
+    <div class="offline-screen hidden" id="offline-screen">
+      <div class="offline-emoji">📡</div>
+      <h2>You're offline</h2>
+      <p>Come back when you're connected to get today's briefing!</p>
+    </div>
+
+  </main>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-tab="world">
+      <span class="nav-icon">🌍</span>
+      <span class="nav-label">World</span>
+    </button>
+    <button class="nav-tab" data-tab="economy">
+      <span class="nav-icon">📈</span>
+      <span class="nav-label">Economy</span>
+    </button>
+    <button class="nav-tab" data-tab="culture">
+      <span class="nav-icon">🎭</span>
+      <span class="nav-label">Culture</span>
+    </button>
+    <button class="nav-tab" data-tab="person">
+      <span class="nav-icon">🏅</span>
+      <span class="nav-label">Person</span>
+    </button>
+    <button class="nav-tab" data-tab="topic5">
+      <span class="nav-icon">📚</span>
+      <span class="nav-label">Topic5</span>
+    </button>
+    <button class="nav-tab" data-tab="quiz">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Quiz</span>
+    </button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
