@@ -565,3 +565,82 @@ html, body {
   color: var(--stone);
   line-height: 1.6;
 }
+
+/* ── Trade Section ──────────────────────────────────────── */
+.trade-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.trade-role-badge.exporter {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.trade-role-badge.importer {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.trade-destinations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.trade-dest-tag {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.trade-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  scrollbar-width: none;
+}
+
+.trade-pills::-webkit-scrollbar { display: none; }
+
+.trade-pill {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: var(--saffron-light);
+  color: #9a3412;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.trade-pill.active {
+  background: var(--saffron);
+  color: var(--white);
+}
+
+.trade-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+}
+
+.trade-stat-label { color: var(--stone); }
+.trade-stat-value { font-weight: 700; color: var(--ink); }

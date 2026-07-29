@@ -59,6 +59,7 @@ function renderAll(data) {
   renderCulture(data.sections.culture);
   renderPerson(data.sections.person);
   renderTopic5(data.sections.topic5);
+  if (data.sections.trade) renderTrade(data.sections.trade);
   renderQuiz(data.sections.quiz.questions);
   document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('hidden'));
   showPanel('world');
@@ -297,6 +298,79 @@ function showQuizResult() {
       <button class="quiz-retry-btn" onclick="renderQuiz(dailyData.sections.quiz.questions)">
         Try Again
       </button>
+    </div>`;
+}
+
+// ── Trade ─────────────────────────────────────────────────
+function renderTrade(trade) {
+  if (!trade) {
+    el('panel-trade').innerHTML = `
+      <div class="card">
+        <div class="section-tag">📦 TRADE & COMMERCE</div>
+        <h2 class="card-headline">Trade data coming soon</h2>
+        <p class="card-body">Today's trade intelligence will appear here once the pipeline runs with the updated data.</p>
+      </div>`;
+    return;
+  }
+
+  const f = trade.featured;
+  const roleClass = f.india_role === 'exporter' ? 'exporter' : 'importer';
+  const roleLabel = f.india_role === 'exporter'
+    ? `🇮🇳 India exports — ${f.india_share}`
+    : `🛒 India imports from ${f.india_share}`;
+
+  const destHTML = f.destinations.map(d =>
+    `<span class="trade-dest-tag">${d}</span>`
+  ).join('');
+
+  const featuredHTML = `
+    <div class="card">
+      <div class="section-tag">📦 TODAY'S SPOTLIGHT</div>
+      <h2 class="card-headline">${f.commodity}</h2>
+      <span class="trade-role-badge ${roleClass}">${roleLabel}</span>
+      <p class="card-body">${f.brief}</p>
+      <div class="trade-stat"><span class="trade-stat-label">Global Value</span><span class="trade-stat-value">${f.value}</span></div>
+      <div class="trade-stat"><span class="trade-stat-label">Annual Volume</span><span class="trade-stat-value">${f.volume}</span></div>
+      <div class="trade-destinations">${destHTML}</div>
+      <div class="upsc-angle" style="margin-top:12px">
+        <div class="upsc-angle-label">🎓 UPSC Angle</div>
+        <div class="upsc-angle-text">${f.upsc_angle}</div>
+      </div>
+      ${chipsHTML(f.chips)}
+    </div>`;
+
+  const exportItems = (trade.india_exports || []).map(item => tradeItemHTML(item)).join('');
+  const importItems = (trade.india_imports || []).map(item => tradeItemHTML(item)).join('');
+
+  el('panel-trade').innerHTML = `
+    ${featuredHTML}
+    <div class="card">
+      <div class="section-tag">🟢 INDIA EXPORTS</div>
+      ${exportItems || '<p class="card-body">No export data today.</p>'}
+    </div>
+    <div class="card">
+      <div class="section-tag">🔵 INDIA IMPORTS</div>
+      ${importItems || '<p class="card-body">No import data today.</p>'}
+    </div>`;
+}
+
+function tradeItemHTML(item) {
+  const roleClass = item.india_role === 'exporter' ? 'exporter' : 'importer';
+  const roleLabel = item.india_role === 'exporter'
+    ? `India exports — ${item.india_share}`
+    : `India imports from ${item.india_share}`;
+  const destHTML = item.destinations.map(d =>
+    `<span class="trade-dest-tag">${d}</span>`
+  ).join('');
+
+  return `
+    <div style="padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+        <span style="font-size:13px; font-weight:700; color:var(--ink);">${item.commodity}</span>
+        <span style="font-size:10px; color:var(--stone);">${item.value}</span>
+      </div>
+      <span class="trade-role-badge ${roleClass}">${roleLabel}</span>
+      <div class="trade-destinations">${destHTML}</div>
     </div>`;
 }
 
