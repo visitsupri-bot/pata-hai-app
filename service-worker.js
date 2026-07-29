@@ -1,6 +1,6 @@
 // service-worker.js — Pata Hai? PWA
 
-const SHELL_CACHE = 'pata-hai-shell-v1';
+const SHELL_CACHE = 'pata-hai-shell-v2';
 const DATA_CACHE  = `pata-hai-data-${new Date().toLocaleDateString('en-CA')}`;
 
 const SHELL_FILES = [
