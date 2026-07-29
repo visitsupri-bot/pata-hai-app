@@ -88,28 +88,29 @@ function sectionCardHTML({ tag, headline, lede, body, upsc_angle, chips }) {
 }
 
 // ── World Affairs ─────────────────────────────────────────
-function renderWorldAffairs(wa) {
-  const perspectives = wa.perspectives || [];
-  const perspHTML = perspectives.length ? `
-    <div class="perspectives-card">
-      <div class="perspectives-header" onclick="togglePerspectives(this)">
-        <span class="perspectives-title">👁 Two Perspectives</span>
-        <span class="perspectives-toggle">▼</span>
-      </div>
-      <div class="perspectives-body">
-        ${perspectives.map(p => `
-          <div class="perspective-item">
-            <span class="perspective-badge ${p.lean}">${p.lean.toUpperCase()}</span>
-            <div class="perspective-source">${p.source}</div>
-            <div class="perspective-headline">${p.headline}</div>
-            <div class="perspective-angle">${p.angle}</div>
-          </div>`).join('')}
-      </div>
-    </div>` : '';
+function renderWorldAffairs(waList) {
+  const items = Array.isArray(waList) ? waList : [waList]; // backward compat
+  el('panel-world').innerHTML = items.map((wa, idx) => {
+    const perspectives = wa.perspectives || [];
+    const perspHTML = perspectives.length ? `
+      <div class="perspectives-card">
+        <div class="perspectives-header" onclick="togglePerspectives(this)">
+          <span class="perspectives-title">👁 Two Perspectives</span>
+          <span class="perspectives-toggle">▼</span>
+        </div>
+        <div class="perspectives-body">
+          ${perspectives.map(p => `
+            <div class="perspective-item">
+              <span class="perspective-badge ${p.lean}">${p.lean.toUpperCase()}</span>
+              <div class="perspective-source">${p.source}</div>
+              <div class="perspective-headline">${p.headline}</div>
+              <div class="perspective-angle">${p.angle}</div>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
 
-  el('panel-world').innerHTML = `
-    <div class="card">
-      <div class="section-tag">${wa.tag}</div>
+    return `<div class="card">
+      <div class="section-tag">${wa.tag} ${idx > 0 ? `<span style="font-size:9px;color:var(--muted);font-weight:400;text-transform:none;">story ${idx+1}</span>` : ''}</div>
       <h2 class="card-headline">${wa.headline}</h2>
       <p class="card-lede">${wa.lede}</p>
       <p class="card-body">${wa.body}</p>
@@ -120,6 +121,7 @@ function renderWorldAffairs(wa) {
       ${chipsHTML(wa.chips)}
       ${perspHTML}
     </div>`;
+  }).join('');
 }
 
 function togglePerspectives(header) {
@@ -135,19 +137,19 @@ function renderEconomy(ec) {
 }
 
 // ── Culture ───────────────────────────────────────────────
-function renderCulture(cu) {
-  const dance = cu.related_dance;
-  const danceHTML = dance ? `
-    <div class="dance-card">
-      <div class="dance-emoji">${dance.emoji}</div>
-      <div>
-        <div class="dance-name">${dance.name}</div>
-        <div class="dance-desc">${dance.desc}</div>
-      </div>
-    </div>` : '';
-
-  el('panel-culture').innerHTML = `
-    <div class="card">
+function renderCulture(cuList) {
+  const items = Array.isArray(cuList) ? cuList : [cuList];
+  el('panel-culture').innerHTML = items.map(cu => {
+    const dance = cu.related_dance;
+    const danceHTML = dance ? `
+      <div class="dance-card">
+        <div class="dance-emoji">${dance.emoji}</div>
+        <div>
+          <div class="dance-name">${dance.name}</div>
+          <div class="dance-desc">${dance.desc}</div>
+        </div>
+      </div>` : '';
+    return `<div class="card">
       <div class="section-tag">${cu.tag}</div>
       <h2 class="card-headline">${cu.headline}</h2>
       <p class="card-lede">${cu.lede}</p>
@@ -159,17 +161,18 @@ function renderCulture(cu) {
       ${chipsHTML(cu.chips)}
       ${danceHTML}
     </div>`;
+  }).join('');
 }
 
 // ── Person ────────────────────────────────────────────────
-function renderPerson(pe) {
-  const wikiLink = pe.wiki_url ? `
-    <a class="wiki-link" href="${pe.wiki_url}" target="_blank" rel="noopener">
-      📖 Read more on Wikipedia →
-    </a>` : '';
-
-  el('panel-person').innerHTML = `
-    <div class="card">
+function renderPerson(peList) {
+  const items = Array.isArray(peList) ? peList : [peList];
+  el('panel-person').innerHTML = items.map(pe => {
+    const wikiLink = pe.wiki_url ? `
+      <a class="wiki-link" href="${pe.wiki_url}" target="_blank" rel="noopener">
+        📖 Read more on Wikipedia →
+      </a>` : '';
+    return `<div class="card">
       <div class="section-tag">${pe.tag}</div>
       <h2 class="card-headline">${pe.headline}</h2>
       <p class="card-lede">${pe.lede}</p>
@@ -181,6 +184,7 @@ function renderPerson(pe) {
       ${chipsHTML(pe.chips)}
       ${wikiLink}
     </div>`;
+  }).join('');
 }
 
 // ── Topic5 ────────────────────────────────────────────────
@@ -200,10 +204,26 @@ function renderTopic5(topic5) {
   ).join('');
 
   const contentHTML = TOPIC5_KEYS.map((t, i) => {
-    const sec = topic5[t.key];
-    if (!sec) return '';
+    const entries = Array.isArray(topic5[t.key]) ? topic5[t.key] : [topic5[t.key]];
+    if (!entries || !entries.length) return '';
+
+    // Sub-pills for 1/2/3 within each topic
+    const subPillsHTML = entries.length > 1 ? `
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        ${entries.map((_, j) => `<button class="topic5-sub-pill ${j===0?'active':''}"
+          onclick="switchSubTopic(this,'t5sub-${t.key}',${j})"
+          style="padding:3px 10px;border-radius:12px;border:1px solid var(--saffron-light);background:${j===0?'var(--saffron)':'transparent'};color:${j===0?'white':'var(--saffron)'};font-size:10px;font-weight:700;cursor:pointer;">${j+1}</button>`).join('')}
+      </div>` : '';
+
+    const entriesHTML = entries.map((sec, j) =>
+      `<div class="topic5-sub-content ${j===0?'':'hidden'}" id="t5sub-${t.key}-${j}">
+        ${sectionCardHTML(sec)}
+      </div>`
+    ).join('');
+
     return `<div class="topic5-content ${i === 0 ? '' : 'hidden'}" id="t5-${t.key}">
-      ${sectionCardHTML(sec)}
+      ${subPillsHTML}
+      ${entriesHTML}
     </div>`;
   }).join('');
 
@@ -217,6 +237,18 @@ function switchTopic5(pill, key) {
   document.querySelectorAll('.topic5-content').forEach(c => c.classList.add('hidden'));
   pill.classList.add('active');
   el(`t5-${key}`).classList.remove('hidden');
+}
+
+function switchSubTopic(pill, prefix, idx) {
+  const parent = pill.closest('.topic5-content');
+  parent.querySelectorAll('.topic5-sub-pill').forEach((p, i) => {
+    p.style.background = i === idx ? 'var(--saffron)' : 'transparent';
+    p.style.color = i === idx ? 'white' : 'var(--saffron)';
+    p.classList.toggle('active', i === idx);
+  });
+  parent.querySelectorAll('.topic5-sub-content').forEach((c, i) => {
+    c.classList.toggle('hidden', i !== idx);
+  });
 }
 
 // ── Quiz ──────────────────────────────────────────────────
