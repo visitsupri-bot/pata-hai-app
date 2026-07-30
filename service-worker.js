@@ -1,6 +1,6 @@
 // service-worker.js — Pata Hai? PWA
 
-const SHELL_CACHE = 'pata-hai-shell-v2';
+const SHELL_CACHE = 'pata-hai-shell-v3';
 const DATA_CACHE  = `pata-hai-data-${new Date().toLocaleDateString('en-CA')}`;
 
 const SHELL_FILES = [
@@ -22,13 +22,16 @@ self.addEventListener('install', event => {
   );
 });
 
-// ── Activate: evict old data caches ──────────────────────
+// ── Activate: evict old shell and data caches ─────────────
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(k => k.startsWith('pata-hai-data-') && k !== DATA_CACHE)
+          .filter(k =>
+            (k.startsWith('pata-hai-data-') && k !== DATA_CACHE) ||
+            (k.startsWith('pata-hai-shell-') && k !== SHELL_CACHE)
+          )
           .map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
