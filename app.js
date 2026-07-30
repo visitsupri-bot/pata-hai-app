@@ -1,6 +1,9 @@
 // app.js — Pata Hai? PWA
 
 const GCS_BASE = 'https://storage.googleapis.com/pata-hai-daily/daily';
+const LOCAL_BASE = './local-daily'; // used when running on localhost
+const DATA_BASE = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+  ? LOCAL_BASE : GCS_BASE;
 
 // ── State ────────────────────────────────────────────────
 let dailyData = null;
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Fetch data
   try {
-    const res = await fetch(`${GCS_BASE}/${today()}.json`);
+    const res = await fetch(`${DATA_BASE}/${today()}.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     dailyData = await res.json();
     renderAll(dailyData);
@@ -55,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderAll(data) {
   el('skeleton').classList.add('hidden');
   renderWorldAffairs(data.sections.world_affairs);
+  if (data.sections.india) renderIndia(data.sections.india);
   renderEconomy(data.sections.economy);
   renderCulture(data.sections.culture);
   renderPerson(data.sections.person);
@@ -109,11 +113,19 @@ function renderWorldAffairs(waList) {
         </div>
       </div>` : '';
 
+    const indiaImpactHTML = wa.india_impact
+      ? `<div class="india-impact-box">
+           <span class="india-impact-label">🇮🇳 India's Stake</span>
+           <span class="india-impact-text">${wa.india_impact}</span>
+         </div>`
+      : '';
+
     return `<div class="card">
       <div class="section-tag">${wa.tag} ${idx > 0 ? `<span style="font-size:9px;color:var(--muted);font-weight:400;text-transform:none;">story ${idx+1}</span>` : ''}</div>
       <h2 class="card-headline">${wa.headline}</h2>
       <p class="card-lede">${wa.lede}</p>
       <p class="card-body">${wa.body}</p>
+      ${indiaImpactHTML}
       <div class="upsc-angle">
         <div class="upsc-angle-label">🎓 UPSC Angle</div>
         <div class="upsc-angle-text">${wa.upsc_angle}</div>
@@ -133,7 +145,57 @@ function togglePerspectives(header) {
 
 // ── Economy ───────────────────────────────────────────────
 function renderEconomy(ec) {
-  el('panel-economy').innerHTML = sectionCardHTML(ec);
+  // Legacy format fallback (old SectionContent shape)
+  if (!ec.market_snapshot) {
+    el('panel-economy').innerHTML = sectionCardHTML(ec);
+    return;
+  }
+
+  const snap = ec.market_snapshot;
+  const snapshotHTML = `
+    <div class="eco-snapshot">
+      <div class="eco-snapshot-title">📊 Market Snapshot</div>
+      <div class="eco-snapshot-stats">
+        <div class="eco-stat">
+          <span class="eco-stat-label">USD/INR</span>
+          <span class="eco-stat-value">₹${snap.usd_inr}</span>
+        </div>
+        <div class="eco-stat">
+          <span class="eco-stat-label">India GDP</span>
+          <span class="eco-stat-value">${snap.gdp_growth}</span>
+        </div>
+        <div class="eco-stat eco-stat-mood">
+          <span class="eco-stat-label">Mood</span>
+          <span class="eco-stat-value">${snap.market_mood}</span>
+        </div>
+      </div>
+      <p class="eco-mood-reason">${snap.mood_reason}</p>
+    </div>`;
+
+  const worldHTML = (ec.world_stories || []).map(s => `
+    <div class="eco-section-label">🌐 World Economy</div>
+    ${sectionCardHTML(s)}`).join('');
+
+  const indiaHTML = (ec.india_stories || []).map(s => `
+    <div class="eco-section-label">🇮🇳 India Economy</div>
+    ${sectionCardHTML(s)}`).join('');
+
+  let unemploymentHTML = '';
+  const unemp = ec.unemployment;
+  if (unemp) {
+    const gs = unemp.global_snapshot || {};
+    unemploymentHTML = `
+      <div class="eco-section-label">👷 Jobs & Labour</div>
+      <div class="unemp-snapshot">
+        <div class="unemp-stat"><span class="unemp-stat-label">📈 Highest</span><span class="unemp-stat-value">${gs.highest || '—'}</span></div>
+        <div class="unemp-stat"><span class="unemp-stat-label">📉 Lowest</span><span class="unemp-stat-value">${gs.lowest || '—'}</span></div>
+        <div class="unemp-stat unemp-stat-india"><span class="unemp-stat-label">🇮🇳 India Rank</span><span class="unemp-stat-value">${gs.india_rank || '—'}</span></div>
+        ${gs.key_insight ? `<div class="unemp-insight">${gs.key_insight}</div>` : ''}
+      </div>
+      ${unemp.story ? sectionCardHTML(unemp.story) : ''}`;
+  }
+
+  el('panel-economy').innerHTML = snapshotHTML + worldHTML + indiaHTML + unemploymentHTML;
 }
 
 // ── Culture ───────────────────────────────────────────────
@@ -247,6 +309,90 @@ function switchSubTopic(pill, prefix, idx) {
     p.classList.toggle('active', i === idx);
   });
   parent.querySelectorAll('.topic5-sub-content').forEach((c, i) => {
+    c.classList.toggle('hidden', i !== idx);
+  });
+}
+
+// ── India ─────────────────────────────────────────────────
+const INDIA_KEYS = [
+  { key: 'politics',     label: '🏛️ Politics',    fullLabel: '🏛️ Politics & Governance' },
+  { key: 'economy',      label: '📊 Economy',     fullLabel: '📊 Indian Economy' },
+  { key: 'social',       label: '🤝 Social',      fullLabel: '🤝 Social Issues' },
+  { key: 'security',     label: '🛡️ Security',    fullLabel: '🛡️ Security & Defence' },
+  { key: 'science',      label: '🚀 Science',     fullLabel: '🚀 Science & Technology' },
+  { key: 'environment',  label: '🌿 Environment', fullLabel: '🌿 Environment & Disasters' },
+];
+
+function renderIndia(india) {
+  if (!india) {
+    el('panel-india').innerHTML = `
+      <div class="card">
+        <div class="section-tag">🇮🇳 INDIA</div>
+        <h2 class="card-headline">India coverage coming soon</h2>
+        <p class="card-body">Today's India briefing will appear here once the pipeline is updated.</p>
+      </div>`;
+    return;
+  }
+
+  const pillsHTML = INDIA_KEYS.map((t, i) =>
+    `<button class="india-pill ${i === 0 ? 'active' : ''}"
+       onclick="switchIndia(this, '${t.key}')">${t.label}</button>`
+  ).join('');
+
+  const contentHTML = INDIA_KEYS.map((t, i) => {
+    const raw = india[t.key];
+    if (!raw) return `<div class="india-content ${i === 0 ? '' : 'hidden'}" id="india-${t.key}">
+      <div class="card">
+        <div class="section-tag">${t.fullLabel}</div>
+        <p class="card-body" style="color:var(--muted)">No data for this category today.</p>
+      </div>
+    </div>`;
+
+    const entries = Array.isArray(raw) ? raw : [raw];
+
+    const subPillsHTML = entries.length > 1 ? `
+      <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
+        ${entries.map((_, j) => `<button class="india-sub-pill ${j === 0 ? 'active' : ''}"
+          onclick="switchIndiaSubTopic(this,'india-sub-${t.key}',${j})"
+          style="padding:3px 10px;border-radius:12px;border:1px solid var(--saffron-light);background:${j === 0 ? 'var(--saffron)' : 'transparent'};color:${j === 0 ? 'white' : 'var(--saffron)'};font-size:10px;font-weight:700;cursor:pointer;">${j + 1}</button>`).join('')}
+      </div>` : '';
+
+    const entriesHTML = entries.map((sec, j) =>
+      `<div class="india-sub-content ${j === 0 ? '' : 'hidden'}" id="india-sub-${t.key}-${j}">
+        ${sectionCardHTML(sec)}
+      </div>`
+    ).join('');
+
+    return `<div class="india-content ${i === 0 ? '' : 'hidden'}" id="india-${t.key}">
+      ${subPillsHTML}
+      ${entriesHTML}
+    </div>`;
+  }).join('');
+
+  el('panel-india').innerHTML = `
+    <div class="india-header">
+      <span class="india-flag">🇮🇳</span>
+      <span class="india-title">India Today</span>
+    </div>
+    <div class="india-pills">${pillsHTML}</div>
+    ${contentHTML}`;
+}
+
+function switchIndia(pill, key) {
+  document.querySelectorAll('.india-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.india-content').forEach(c => c.classList.add('hidden'));
+  pill.classList.add('active');
+  el(`india-${key}`).classList.remove('hidden');
+}
+
+function switchIndiaSubTopic(pill, prefix, idx) {
+  const parent = pill.closest('.india-content');
+  parent.querySelectorAll('.india-sub-pill').forEach((p, i) => {
+    p.style.background = i === idx ? 'var(--saffron)' : 'transparent';
+    p.style.color = i === idx ? 'white' : 'var(--saffron)';
+    p.classList.toggle('active', i === idx);
+  });
+  parent.querySelectorAll('.india-sub-content').forEach((c, i) => {
     c.classList.toggle('hidden', i !== idx);
   });
 }
@@ -374,8 +520,111 @@ function renderTrade(trade) {
   const exportItems = (trade.india_exports || []).map(item => tradeItemHTML(item)).join('');
   const importItems = (trade.india_imports || []).map(item => tradeItemHTML(item)).join('');
 
+  const trendsHTML = (trade.trends || []).length ? `
+    <div class="trends-header">
+      <span class="trends-title">📊 Top 5 Industry Markets</span>
+      <span class="trends-subtitle">Global performance · India impact</span>
+    </div>
+    ${(trade.trends || []).map(t => `
+    <div class="trend-card">
+      <div class="trend-card-top">
+        <span class="trend-rank">#${t.rank}</span>
+        <span class="trend-tag">${t.tag}</span>
+        <span class="trend-perf">${t.performance}</span>
+      </div>
+      <h2 class="card-headline" style="margin:8px 0 4px">${t.headline}</h2>
+      <p class="card-lede">${t.lede}</p>
+      <div class="trend-impact-block trend-world">
+        <div class="trend-impact-label">🌍 World Impact</div>
+        <div class="trend-impact-text">${t.world_impact}</div>
+      </div>
+      <div class="trend-impact-block trend-india">
+        <div class="trend-impact-label">🇮🇳 India Impact</div>
+        <div class="trend-impact-text">${t.india_impact}</div>
+      </div>
+      <div class="upsc-angle">
+        <div class="upsc-angle-label">🎓 UPSC Angle</div>
+        <div class="upsc-angle-text">${t.upsc_angle}</div>
+      </div>
+      ${chipsHTML(t.chips)}
+    </div>`).join('')}` : '';
+
+  // ── Investment Picks ──
+  const inv = trade.investment_picks;
+  let investHTML = '';
+  if (inv) {
+    const renderPickList = (picks, prefix) => (picks || []).map((p, i) => `
+      <div class="inv-pick ${i === 0 ? '' : 'hidden'}" id="${prefix}-${i}">
+        <div class="inv-pick-top">
+          <span class="inv-rank">#${p.rank}</span>
+          <span class="inv-tag">${p.tag}</span>
+          <span class="inv-rating">${p.rating}</span>
+        </div>
+        <div class="inv-stocks">🏢 ${p.representative_stocks}</div>
+        <div class="inv-why">${p.why_now}</div>
+        <div class="inv-play-block">
+          <span class="inv-play-label">💡 How to invest</span>
+          <span class="inv-play-text">${p.india_play}</span>
+        </div>
+        <div class="inv-risk">⚠️ Risk: ${p.risk}</div>
+        ${chipsHTML(p.chips)}
+      </div>`).join('');
+
+    const renderSubPills = (picks, prefix) => picks.length > 1 ? `
+      <div class="inv-sub-pills">
+        ${picks.map((p, i) => `
+          <button class="inv-sub-pill ${i === 0 ? 'active' : ''}"
+            onclick="switchInvPick(this,'${prefix}',${i},${picks.length})">
+            ${p.sector}
+          </button>`).join('')}
+      </div>` : '';
+
+    investHTML = `
+      <div class="inv-header">
+        <span class="inv-title">💰 Investment Picks</span>
+        <span class="inv-disclaimer">${inv.disclaimer || 'Educational only. Not financial advice.'}</span>
+      </div>
+      ${inv.reasoning ? `<div class="inv-reasoning">🧠 ${inv.reasoning}</div>` : ''}
+      <div class="inv-cap-pills">
+        <button class="inv-cap-pill active" onclick="switchInvCap(this,'inv-large')">🏦 Large Cap</button>
+        <button class="inv-cap-pill" onclick="switchInvCap(this,'inv-mid')">📈 Mid Cap</button>
+      </div>
+
+      <div class="inv-cap-section" id="inv-large">
+        <div class="inv-market-pills">
+          <button class="inv-market-pill active" onclick="switchInvMarket(this,'lc','world')">🌍 World</button>
+          <button class="inv-market-pill" onclick="switchInvMarket(this,'lc','india')">🇮🇳 India</button>
+        </div>
+        <div class="inv-market-content" id="lc-world">
+          ${renderSubPills(inv.large_cap?.world || [], 'lc-w')}
+          ${renderPickList(inv.large_cap?.world || [], 'lc-w')}
+        </div>
+        <div class="inv-market-content hidden" id="lc-india">
+          ${renderSubPills(inv.large_cap?.india || [], 'lc-i')}
+          ${renderPickList(inv.large_cap?.india || [], 'lc-i')}
+        </div>
+      </div>
+
+      <div class="inv-cap-section hidden" id="inv-mid">
+        <div class="inv-market-pills">
+          <button class="inv-market-pill active" onclick="switchInvMarket(this,'mc','world')">🌍 World</button>
+          <button class="inv-market-pill" onclick="switchInvMarket(this,'mc','india')">🇮🇳 India</button>
+        </div>
+        <div class="inv-market-content" id="mc-world">
+          ${renderSubPills(inv.mid_cap?.world || [], 'mc-w')}
+          ${renderPickList(inv.mid_cap?.world || [], 'mc-w')}
+        </div>
+        <div class="inv-market-content hidden" id="mc-india">
+          ${renderSubPills(inv.mid_cap?.india || [], 'mc-i')}
+          ${renderPickList(inv.mid_cap?.india || [], 'mc-i')}
+        </div>
+      </div>`;
+  }
+
   el('panel-trade').innerHTML = `
     ${featuredHTML}
+    ${trendsHTML}
+    ${investHTML}
     <div class="card">
       <div class="section-tag">🟢 INDIA EXPORTS</div>
       ${exportItems || '<p class="card-body">No export data today.</p>'}
@@ -384,6 +633,31 @@ function renderTrade(trade) {
       <div class="section-tag">🔵 INDIA IMPORTS</div>
       ${importItems || '<p class="card-body">No import data today.</p>'}
     </div>`;
+}
+
+function switchInvCap(btn, targetId) {
+  document.querySelectorAll('.inv-cap-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.inv-cap-section').forEach(s => s.classList.add('hidden'));
+  btn.classList.add('active');
+  el(targetId).classList.remove('hidden');
+}
+
+function switchInvMarket(btn, prefix, market) {
+  const section = btn.closest('.inv-cap-section');
+  section.querySelectorAll('.inv-market-pill').forEach(p => p.classList.remove('active'));
+  section.querySelectorAll('.inv-market-content').forEach(c => c.classList.add('hidden'));
+  btn.classList.add('active');
+  el(`${prefix}-${market}`).classList.remove('hidden');
+}
+
+function switchInvPick(btn, prefix, idx, total) {
+  for (let i = 0; i < total; i++) {
+    const pick = el(`${prefix}-${i}`);
+    if (pick) pick.classList.toggle('hidden', i !== idx);
+  }
+  btn.closest('.inv-sub-pills').querySelectorAll('.inv-sub-pill').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
 }
 
 function tradeItemHTML(item) {

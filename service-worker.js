@@ -1,6 +1,15 @@
 // service-worker.js — Pata Hai? PWA
 
-const SHELL_CACHE = 'pata-hai-shell-v3';
+// On localhost: self-unregister so the SW never blocks local dev
+if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+  self.addEventListener('install', () => self.skipWaiting());
+  self.addEventListener('activate', () => {
+    self.registration.unregister();
+    self.clients.matchAll().then(clients => clients.forEach(c => c.navigate(c.url)));
+  });
+} else {
+
+const SHELL_CACHE = 'pata-hai-shell-v4';
 const DATA_CACHE  = `pata-hai-data-${new Date().toLocaleDateString('en-CA')}`;
 
 const SHELL_FILES = [
@@ -41,6 +50,15 @@ self.addEventListener('activate', event => {
 // ── Fetch: shell = cache-first, data = network-first ─────
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  // Local dev: never cache local-daily JSON — always fetch fresh from network
+  const isLocalData = (url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+                      url.pathname.includes('/local-daily/');
+  if (isLocalData) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   const isGCSData = url.hostname === 'storage.googleapis.com' &&
                     url.pathname.includes('/pata-hai-daily/daily/');
 
@@ -63,3 +81,5 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+
+} // end else (non-localhost)

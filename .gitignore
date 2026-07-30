@@ -1,0 +1,4 @@
+# Local dev only — never commit
+local-daily/
+test.html
+*.DS_Store
