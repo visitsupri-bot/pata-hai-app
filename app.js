@@ -41,12 +41,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.addEventListener('click', () => showPanel(btn.dataset.tab));
   });
 
-  // Fetch data
+  // Fetch data — try dated file first, fall back to latest.json
   try {
-    const res = await fetch(`${DATA_BASE}/${today()}.json`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    dailyData = await res.json();
-    renderAll(dailyData);
+    let res = await fetch(`${DATA_BASE}/${today()}.json`);
+    // If dated file returns old format (no india section), try latest.json
+    if (res.ok) {
+      const data = await res.json();
+      if (!data.sections?.india) {
+        const latest = await fetch(`${DATA_BASE}/latest.json`);
+        if (latest.ok) {
+          const latestData = await latest.json();
+          if (latestData.sections?.india) {
+            dailyData = latestData;
+            renderAll(dailyData);
+            return;
+          }
+        }
+      }
+      dailyData = data;
+      renderAll(dailyData);
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
   } catch (err) {
     console.error('[pata-hai] fetch failed:', err);
     el('skeleton').classList.add('hidden');
