@@ -1174,3 +1174,47 @@ html, body {
   background: #0369a1;
   color: #fff;
 }
+
+/* ── Sport Tab ─────────────────────────────────────────── */
+.sport-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sport-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink, #1e293b);
+}
+.sport-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.sport-pill {
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1.5px solid var(--saffron, #ea580c);
+  background: transparent;
+  color: var(--saffron, #ea580c);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.sport-pill.active {
+  background: var(--saffron, #ea580c);
+  color: #fff;
+}
+.sport-fun-fact {
+  background: #fef9c3;
+  border-left: 3px solid #eab308;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: #713f12;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.sport-content.hidden { display: none; }

@@ -80,6 +80,7 @@ function renderAll(data) {
   renderPerson(data.sections.person);
   renderTopic5(data.sections.topic5);
   if (data.sections.trade) renderTrade(data.sections.trade);
+  if (data.sections.sport) renderSport(data.sections.sport);
   renderQuiz(data.sections.quiz.questions);
   document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('hidden'));
   showPanel('world');
@@ -731,6 +732,74 @@ function tradeItemHTML(item) {
       <span class="trade-role-badge ${roleClass}">${roleLabel}</span>
       <div class="trade-destinations">${destHTML}</div>
     </div>`;
+}
+
+// ── Sport ─────────────────────────────────────────────────
+function renderSport(sport) {
+  const panel = el('panel-sport');
+  if (!sport) {
+    panel.innerHTML = '<div class="card"><p class="card-body">Sport briefing coming soon.</p></div>';
+    return;
+  }
+
+  const SPORT_KEYS = [
+    { key: 'mainstream',  label: '🏟️ Mainstream Sport' },
+    { key: 'unexplored',  label: '🔭 Unexplored Sport' },
+    { key: 'india_sport', label: '🇮🇳 India Sport' },
+  ];
+
+  const pillsHTML = SPORT_KEYS.map((t, i) =>
+    `<button class="sport-pill ${i === 0 ? 'active' : ''}"
+       onclick="switchSport(this, '${t.key}')">${t.label}</button>`
+  ).join('');
+
+  const contentHTML = SPORT_KEYS.map((t, i) => {
+    const entries = Array.isArray(sport[t.key]) ? sport[t.key] : [];
+    if (!entries.length) return `<div class="sport-content ${i === 0 ? '' : 'hidden'}" id="sport-${t.key}">
+      <div class="card"><p class="card-body" style="color:var(--muted)">No data today.</p></div>
+    </div>`;
+
+    const cardsHTML = entries.map(entry => {
+      const funFactHTML = entry.fun_fact
+        ? `<div class="sport-fun-fact">💡 ${entry.fun_fact}</div>` : '';
+      const exploreHTML = (entry.explore_more && entry.explore_more.length) ? `
+        <div class="explore-more">
+          <span class="explore-more-label">🔗 Explore More</span>
+          ${entry.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+        </div>` : '';
+      return `<div class="card">
+        <div class="section-tag">${entry.tag}</div>
+        <h2 class="card-headline">${entry.headline}</h2>
+        <p class="card-lede">${entry.lede}</p>
+        <p class="card-body">${entry.body}</p>
+        ${funFactHTML}
+        <div class="upsc-angle">
+          <div class="upsc-angle-label">🎓 UPSC Angle</div>
+          <div class="upsc-angle-text">${entry.upsc_angle}</div>
+        </div>
+        ${chipsHTML(entry.chips)}
+        ${exploreHTML}
+      </div>`;
+    }).join('');
+
+    return `<div class="sport-content ${i === 0 ? '' : 'hidden'}" id="sport-${t.key}">
+      ${cardsHTML}
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="sport-header">
+      <span class="sport-title">🏆 Sport</span>
+    </div>
+    <div class="sport-pills">${pillsHTML}</div>
+    ${contentHTML}`;
+}
+
+function switchSport(pill, key) {
+  document.querySelectorAll('.sport-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sport-content').forEach(c => c.classList.add('hidden'));
+  pill.classList.add('active');
+  el(`sport-${key}`).classList.remove('hidden');
 }
 
 // ── Service Worker Registration ───────────────────────────
