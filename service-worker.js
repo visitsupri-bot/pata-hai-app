@@ -9,7 +9,7 @@ if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.
   });
 } else {
 
-const SHELL_CACHE = 'pata-hai-shell-v4';
+const SHELL_CACHE = 'pata-hai-shell-v5';
 const DATA_CACHE  = `pata-hai-data-${new Date().toLocaleDateString('en-CA')}`;
 
 const SHELL_FILES = [
@@ -74,10 +74,15 @@ self.addEventListener('fetch', event => {
         .catch(() => caches.match(event.request))
     );
   } else {
-    // Cache-first: app shell files
+    // Network-first: app shell files — ensures updated app.js/style.css always deploy
     event.respondWith(
-      caches.match(event.request)
-        .then(cached => cached || fetch(event.request))
+      fetch(event.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(SHELL_CACHE).then(c => c.put(event.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
     );
   }
 });

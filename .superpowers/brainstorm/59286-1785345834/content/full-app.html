@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sattva — Full App Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fdf6ee; color: #1c1207; }
+
+  :root {
+    --saffron:  #e07b1a;
+    --turmeric: #c9860d;
+    --gold:     #d4a017;
+    --forest:   #1e4d2b;
+    --moss:     #3a6b3e;
+    --sage:     #6b8f6b;
+    --cream:    #fdf6ee;
+    --bark:     #78350f;
+    --text:     #1c1207;
+    --muted:    #7c6a52;
+    --card-bg:  #ffffff;
+    --red:      #c0392b;
+    --blue:     #1a6fa8;
+  }
+
+  .app-header {
+    background: var(--forest);
+    color: var(--gold);
+    padding: 14px 18px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20;
+    border-bottom: 2px solid var(--saffron);
+  }
+  .app-logo { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; }
+  .app-logo em { color: var(--saffron); font-style: normal; }
+  .app-date { font-size: 0.72rem; color: var(--sage); }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--forest);
+    border-top: 2px solid var(--saffron);
+    display: flex; justify-content: space-around;
+    padding: 7px 2px 13px; z-index: 20;
+  }
+  .nav-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; cursor: pointer;
+    color: var(--sage); font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.3px; text-transform: uppercase; padding: 3px 6px;
+    border-radius: 8px; transition: color 0.2s; min-width: 48px;
+  }
+  .nav-tab .ni { font-size: 1.25rem; }
+  .nav-tab.active { color: var(--gold); }
+  .nav-tab.active .ni { filter: drop-shadow(0 0 4px rgba(212,160,23,0.8)); }
+
+  .panel { display: none; padding: 14px; padding-bottom: 88px; }
+  .panel.active { display: block; }
+
+  /* ── Shared components ── */
+  .sec-label {
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 1.6px;
+    text-transform: uppercase; color: var(--muted); margin: 18px 0 9px;
+  }
+  .card {
+    background: var(--card-bg); border-radius: 14px; padding: 15px;
+    margin-bottom: 12px; box-shadow: 0 2px 10px rgba(28,18,7,0.07);
+    border-left: 4px solid var(--saffron);
+  }
+  .card.green  { border-left-color: var(--moss); }
+  .card.gold   { border-left-color: var(--gold); }
+  .card.blue   { border-left-color: var(--blue); }
+  .card.red    { border-left-color: var(--red); }
+  .card.flat   { border-left: none; border-top: 3px solid var(--saffron); }
+  .ctag {
+    font-size: 0.6rem; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--saffron); margin-bottom: 5px;
+  }
+  .card.green .ctag { color: var(--moss); }
+  .card.gold  .ctag { color: var(--turmeric); }
+  .card.blue  .ctag { color: var(--blue); }
+  .card.red   .ctag { color: var(--red); }
+  .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; }
+  .card p  { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+  .badge {
+    display: inline-block; font-size: 0.6rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 99px; margin-left: 6px; vertical-align: middle;
+  }
+  .badge-green { background: #e8f4eb; color: var(--forest); }
+  .badge-orange { background: #fef3e2; color: var(--bark); }
+  .badge-blue { background: #e8f0fb; color: var(--blue); }
+  .badge-red { background: #fdecea; color: var(--red); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+  .chip {
+    font-size: 0.67rem; padding: 3px 10px; border-radius: 99px;
+    background: #fef3e2; color: var(--bark); font-weight: 600;
+    border: 1px solid #f5d6a0;
+  }
+  .chip.g { background: #e8f4eb; color: var(--forest); border-color: #b0d4b8; }
+  .chip.b { background: #e8f0fb; color: var(--blue); border-color: #a8c4e8; }
+  .row { display: flex; gap: 10px; }
+  .row .card { flex: 1; }
+  .btn {
+    display: inline-block; padding: 7px 16px; border-radius: 99px;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none;
+    background: var(--saffron); color: #fff; margin-top: 10px;
+  }
+  .btn.outline {
+    background: none; border: 1.5px solid var(--moss); color: var(--moss);
+  }
+  .btn.sm { padding: 5px 12px; font-size: 0.66rem; margin-top: 6px; }
+  .divider { height: 1px; background: #ede4d8; margin: 14px 0; }
+
+  /* ── TAB 1: Schedule ── */
+  .class-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; background: #fff; border-radius: 12px;
+    margin-bottom: 8px; box-shadow: 0 1px 6px rgba(28,18,7,0.06);
+  }
+  .class-time {
+    min-width: 52px; text-align: center;
+    font-size: 0.75rem; font-weight: 800; color: var(--forest);
+    line-height: 1.3;
+  }
+  .class-time span { display: block; font-size: 0.6rem; font-weight: 400; color: var(--sage); }
+  .class-info { flex: 1; }
+  .class-info h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 2px; }
+  .class-info p  { font-size: 0.7rem; color: var(--muted); }
+  .class-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-fixed { background: var(--moss); }
+  .dot-adhoc { background: var(--saffron); }
+  .dot-event { background: var(--gold); }
+
+  /* ── TAB 2: Attendance ── */
+  .attend-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  .attend-table th {
+    text-align: left; padding: 6px 8px;
+    font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid #ede4d8;
+  }
+  .attend-table td { padding: 9px 8px; border-bottom: 1px solid #f5ece0; }
+  .attend-table tr:last-child td { border-bottom: none; }
+  .tick { color: var(--moss); font-size: 1rem; }
+  .cross { color: var(--red); font-size: 1rem; }
+  .inv-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: #fff; border-radius: 12px;
+    margin-bottom: 8px; box-shadow: 0 1px 6px rgba(28,18,7,0.06);
+  }
+  .inv-name { font-size: 0.85rem; font-weight: 700; }
+  .inv-meta { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .inv-amt  { font-size: 1rem; font-weight: 800; color: var(--forest); }
+
+  /* ── TAB 3: Class Plan ── */
+  .week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .day-card {
+    background: #fff; border-radius: 12px; padding: 11px 12px;
+    box-shadow: 0 1px 6px rgba(28,18,7,0.06); border-top: 3px solid var(--moss);
+  }
+  .day-card.today { border-top-color: var(--saffron); }
+  .day-name { font-size: 0.62rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .day-card.today .day-name { color: var(--saffron); }
+  .day-card h4 { font-size: 0.8rem; font-weight: 700; margin-bottom: 3px; }
+  .day-card p  { font-size: 0.68rem; color: var(--muted); }
+
+  /* ── TAB 4: Tip ── */
+  .tip-hero {
+    background: linear-gradient(145deg, var(--forest), var(--moss));
+    border-radius: 16px; padding: 20px 18px; margin-bottom: 14px;
+    color: var(--cream); position: relative; overflow: hidden;
+  }
+  .tip-hero::after { content:'🌿'; font-size:5rem; opacity:0.1; position:absolute; right:-8px; bottom:-8px; }
+  .tip-hero .th-tag { font-size:0.6rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:7px; }
+  .tip-hero h2 { font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:6px; }
+  .tip-hero p  { font-size:0.78rem; color:rgba(253,246,238,0.85); line-height:1.6; }
+  .ailment-chip {
+    display: inline-block; font-size: 0.67rem; padding: 4px 12px;
+    border-radius: 99px; border: 1.5px solid var(--saffron);
+    color: var(--saffron); font-weight: 700; margin: 4px 4px 0 0; cursor: pointer;
+  }
+  .ailment-chip.sel { background: var(--saffron); color: #fff; }
+
+  /* ── TAB 5: Opportunity ── */
+  .opp-hero {
+    background: linear-gradient(135deg, #0f2d1a, #1e4d2b);
+    border-radius: 16px; padding: 18px; margin-bottom: 14px; color: var(--cream);
+  }
+  .opp-hero .oh-tag { font-size:0.6rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+  .opp-hero h2 { font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:5px; }
+  .opp-hero p  { font-size:0.75rem; color:rgba(253,246,238,0.8); line-height:1.5; }
+  .trend-bar { display:flex; align-items:flex-end; gap:4px; height:50px; margin-top:10px; }
+  .trend-bar span { flex:1; background:var(--moss); border-radius:3px 3px 0 0; opacity:0.7; }
+  .trend-bar span.hi { background:var(--saffron); opacity:1; }
+  .venue-row {
+    display:flex; align-items:center; gap:10px; padding:10px 13px;
+    background:#fff; border-radius:12px; margin-bottom:8px;
+    box-shadow:0 1px 6px rgba(28,18,7,0.06);
+  }
+  .venue-icon { font-size:1.6rem; }
+  .venue-info { flex:1; }
+  .venue-info h4 { font-size:0.82rem; font-weight:700; margin-bottom:2px; }
+  .venue-info p  { font-size:0.68rem; color:var(--muted); }
+  .diff-card {
+    background: linear-gradient(135deg, #fef8ee, #fff8e8);
+    border: 1px solid #f0d9a0; border-radius: 14px; padding: 15px; margin-bottom: 12px;
+  }
+  .diff-card .dc-tag { font-size:0.6rem; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--turmeric); margin-bottom:6px; }
+  .diff-card h3 { font-size:0.9rem; font-weight:700; margin-bottom:5px; }
+  .diff-card p  { font-size:0.75rem; color:var(--muted); line-height:1.55; }
+
+  /* ── TAB 6: Wisdom ── */
+  .text-selector { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px; }
+  .text-btn {
+    flex-shrink:0; font-size:0.68rem; font-weight:700; padding:6px 14px;
+    border-radius:99px; border:1.5px solid var(--forest); color:var(--forest);
+    background:none; cursor:pointer;
+  }
+  .text-btn.sel { background:var(--forest); color:var(--gold); }
+  .shloka {
+    background: linear-gradient(135deg, #fffbf2, #fef6e4);
+    border:1px solid #f0d9a0; border-radius:14px; padding:18px; margin-bottom:14px;
+  }
+  .shloka .src { font-size:0.62rem; color:var(--turmeric); font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:7px; }
+  .shloka .verse { font-size:1rem; color:var(--bark); font-weight:700; line-height:1.8; margin-bottom:8px; font-style:italic; }
+  .shloka .trans { font-size:0.8rem; color:var(--text); font-weight:600; margin-bottom:8px; }
+  .interp {
+    border-top:1px solid #f0d9a0; padding-top:10px; margin-top:10px;
+  }
+  .interp-item { margin-bottom:10px; }
+  .interp-name { font-size:0.65rem; font-weight:800; color:var(--moss); margin-bottom:3px; }
+  .interp-text { font-size:0.75rem; color:var(--muted); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <span class="app-logo">🪷 <em>Sattva</em> Studio</span>
+  <span class="app-date">Wed, 29 Jul 2026</span>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     TAB 1 — SCHEDULE
+════════════════════════════════════════════ -->
+<div class="panel active" id="panel-schedule">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div class="sec-label" style="margin:0">This Week</div>
+    <button class="btn sm">+ Add Class</button>
+  </div>
+
+  <div style="display:flex;gap:6px;margin-bottom:14px;margin-top:10px;">
+    <span class="chip g">● Fixed</span>
+    <span class="chip">● Drop-in</span>
+    <span class="chip b">● Event</span>
+  </div>
+
+  <div class="class-row">
+    <div class="class-time">07:00<span>Mon</span></div>
+    <div class="class-dot dot-fixed"></div>
+    <div class="class-info">
+      <h4>Morning Hatha <span class="badge badge-green">6 enrolled</span></h4>
+      <p>📍 Greenleaf Studio, Bandra</p>
+    </div>
+  </div>
+  <div class="class-row">
+    <div class="class-time">18:30<span>Mon</span></div>
+    <div class="class-dot dot-fixed"></div>
+    <div class="class-info">
+      <h4>Corporate Yoga <span class="badge badge-orange">12 enrolled</span></h4>
+      <p>📍 TCS Campus, Powai</p>
+    </div>
+  </div>
+  <div class="class-row">
+    <div class="class-time">07:00<span>Wed</span></div>
+    <div class="class-dot dot-fixed"></div>
+    <div class="class-info">
+      <h4>Morning Hatha <span class="badge badge-green">6 enrolled</span></h4>
+      <p>📍 Greenleaf Studio, Bandra</p>
+    </div>
+  </div>
+  <div class="class-row">
+    <div class="class-time">10:00<span>Thu</span></div>
+    <div class="class-dot dot-adhoc"></div>
+    <div class="class-info">
+      <h4>1:1 Session — Priya M. <span class="badge badge-orange">Drop-in</span></h4>
+      <p>📍 Online / Zoom</p>
+    </div>
+  </div>
+  <div class="class-row" style="border:1.5px solid var(--gold); background:#fffbf0;">
+    <div class="class-time">16:00<span>Sat</span></div>
+    <div class="class-dot dot-event"></div>
+    <div class="class-info">
+      <h4>Sound Bath Workshop <span class="badge badge-blue">Event · ₹1,500/head</span></h4>
+      <p>📍 The Westin, Goregaon — 18 booked</p>
+    </div>
+  </div>
+
+  <div class="sec-label">Next Week Preview</div>
+  <div class="card green">
+    <div class="ctag">Upcoming</div>
+    <h3>Yin Yoga + Sound Healing</h3>
+    <p>Aug 3 · Sunday · 5:00 PM · Juhu Beach Resort · 24 seats open</p>
+    <button class="btn sm outline">Plan Sequence →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 2 — ATTENDANCE & INVOICES
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-attend">
+
+  <div class="sec-label">Morning Hatha · Wed 29 Jul · 07:00</div>
+
+  <div class="card flat" style="padding:0;overflow:hidden;">
+    <table class="attend-table">
+      <thead>
+        <tr>
+          <th>Participant</th>
+          <th>Plan</th>
+          <th>Present</th>
+          <th>Sessions left</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ananya S.</strong></td>
+          <td><span class="badge badge-green">Monthly ×12</span></td>
+          <td><span class="tick">✓</span></td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td><strong>Rajan K.</strong></td>
+          <td><span class="badge badge-green">Monthly ×8</span></td>
+          <td><span class="tick">✓</span></td>
+          <td>1 ⚠️</td>
+        </tr>
+        <tr>
+          <td><strong>Meera T.</strong></td>
+          <td><span class="badge badge-orange">Drop-in</span></td>
+          <td><span class="tick">✓</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Suresh P.</strong></td>
+          <td><span class="badge badge-green">Monthly ×12</span></td>
+          <td><span class="cross">✗</span></td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <td><strong>Divya R.</strong></td>
+          <td><span class="badge badge-orange">Drop-in</span></td>
+          <td><span class="tick">✓</span></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label">Invoices — July 2026</div>
+
+  <div class="inv-row">
+    <div>
+      <div class="inv-name">Ananya S.</div>
+      <div class="inv-meta">Monthly ×12 · 11/12 attended · Due Aug 1</div>
+    </div>
+    <div style="text-align:right">
+      <div class="inv-amt">₹4,800</div>
+      <span class="badge badge-green">Paid</span>
+    </div>
+  </div>
+  <div class="inv-row">
+    <div>
+      <div class="inv-name">Rajan K.</div>
+      <div class="inv-meta">Monthly ×8 · 7/8 attended · Due Aug 1</div>
+    </div>
+    <div style="text-align:right">
+      <div class="inv-amt">₹3,200</div>
+      <span class="badge badge-red">Pending</span>
+    </div>
+  </div>
+  <div class="inv-row">
+    <div>
+      <div class="inv-name">Sound Bath · Westin</div>
+      <div class="inv-meta">Event · 18 participants × ₹1,500</div>
+    </div>
+    <div style="text-align:right">
+      <div class="inv-amt">₹27,000</div>
+      <span class="badge badge-orange">Draft</span>
+    </div>
+  </div>
+
+  <button class="btn" style="width:100%;text-align:center;margin-top:4px;">📄 Generate All Pending Invoices</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 3 — CLASS PLAN
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-plan">
+
+  <div class="sec-label">Week Theme</div>
+  <div class="card gold">
+    <div class="ctag">This Week · Jul 28 – Aug 3</div>
+    <h3>🌊 Surrender & Trust — Ishvara Pranidhana</h3>
+    <p>Focus on deep backbends, heart-opening poses, and long holds. Pranayama: Bhramari & Nadi Shodhana. Sound: 432 Hz + Tibetan bowls.</p>
+  </div>
+
+  <div class="sec-label">Daily Plan</div>
+  <div class="week-grid">
+    <div class="day-card">
+      <div class="day-name">Monday</div>
+      <h4>Sun Salutations + Twists</h4>
+      <p>Energise · 60 min</p>
+    </div>
+    <div class="day-card today">
+      <div class="day-name">Wednesday · Today</div>
+      <h4>Heart Openers + Bhujangasana</h4>
+      <p>Saffron theme · 60 min</p>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Thursday</div>
+      <h4>1:1 · Priya — Lower back</h4>
+      <p>Therapeutic · 45 min</p>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Saturday</div>
+      <h4>Sound Bath Workshop</h4>
+      <p>Westin · 90 min</p>
+    </div>
+  </div>
+
+  <div class="sec-label">Today's Sequence — Heart Openers</div>
+  <div class="card green">
+    <div class="ctag">Sequence · 60 min</div>
+    <h3>7-pose build to Ustrasana (Camel)</h3>
+    <p>Balasana → Cat-Cow → Sphinx → Bhujangasana → Dhanurasana → Setu Bandha → <strong>Ustrasana</strong></p>
+    <div class="chips">
+      <span class="chip g">Nadi Shodhana (10 min)</span>
+      <span class="chip">Savasana (10 min)</span>
+    </div>
+    <button class="btn sm outline">Edit Sequence</button>
+  </div>
+
+  <div class="card">
+    <div class="ctag">Sound Layer</div>
+    <h3>🔊 432 Hz + Heart Chakra (Anahata)</h3>
+    <p>Play during Savasana. Tibetan singing bowls in F note. Duration: 12 min.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 4 — TIP OF THE DAY
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-tip">
+
+  <div class="tip-hero">
+    <div class="th-tag">🌿 Yoga + Ayurveda · Today's Focus</div>
+    <h2>Chronic Lower Back Pain</h2>
+    <p>A combination of vata imbalance and weak core. Today's sequence and dietary tips address root cause, not just symptom relief.</p>
+  </div>
+
+  <div class="sec-label">Select Ailment / Condition</div>
+  <div style="margin-bottom:14px;">
+    <span class="ailment-chip sel">Lower Back Pain</span>
+    <span class="ailment-chip">Anxiety</span>
+    <span class="ailment-chip">Insomnia</span>
+    <span class="ailment-chip">Digestive Issues</span>
+    <span class="ailment-chip">Migraine</span>
+    <span class="ailment-chip">Hypertension</span>
+    <span class="ailment-chip">Fatigue</span>
+    <span class="ailment-chip">Knee Pain</span>
+    <span class="ailment-chip">Hormonal Balance</span>
+    <span class="ailment-chip">Grief / Loss</span>
+  </div>
+
+  <div class="card">
+    <div class="ctag">Yoga Rx</div>
+    <h3>Asanas for Lower Back</h3>
+    <p>Supta Padangusthasana · Pawanmuktasana · Apanasana · Setu Bandha · Gentle twists. Avoid deep forward folds initially.</p>
+    <div class="chips">
+      <span class="chip">Avoid: Paschimottanasana</span>
+      <span class="chip">Duration: 30–40 min</span>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="ctag">Ayurvedic Rx</div>
+    <h3>Warm Sesame Oil Self-Massage (Abhyanga)</h3>
+    <p>Massage lumbar region with warm sesame oil for 10 min before bath. Pacifies vata in the lower body. Do daily for 7 days.</p>
+  </div>
+
+  <div class="card gold">
+    <div class="ctag">Sattvic Diet</div>
+    <h3>Reduce Rajasic & Tamasic Foods</h3>
+    <p>Avoid cold, dry, raw foods. Favour warm soups, ghee, well-cooked grains. Trikatu churna with warm water after meals aids digestion and reduces vata.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 5 — OPPORTUNITY
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-opp">
+
+  <div class="opp-hero">
+    <div class="oh-tag">📡 Market Radar · Updated Today</div>
+    <h2>Sound Healing is having a moment</h2>
+    <p>"Sound Bath" searches +68% YoY in India. Corporate wellness & luxury hospitality are the fastest-growing segments.</p>
+    <div class="trend-bar">
+      <span style="height:25%"></span>
+      <span style="height:35%"></span>
+      <span style="height:40%"></span>
+      <span style="height:50%"></span>
+      <span style="height:58%"></span>
+      <span style="height:72%"></span>
+      <span style="height:80%"></span>
+      <span class="hi" style="height:100%"></span>
+    </div>
+  </div>
+
+  <div class="sec-label">Trending Right Now 🔥</div>
+  <div class="card">
+    <div class="ctag">Instagram · India</div>
+    <h3>#SoundBath trending — 2.3M posts</h3>
+    <p>Reels showing Tibetan bowl sessions in nature settings getting 10×+ engagement vs. mat-based yoga content.</p>
+    <div class="chips"><span class="chip">#NadaYoga</span><span class="chip">#SoundHealing</span><span class="chip">#432Hz</span></div>
+  </div>
+  <div class="card gold">
+    <div class="ctag">YouTube · Global</div>
+    <h3>"Yoga Nidra for Sleep" — 890K searches/month</h3>
+    <p>Opportunity: 45-min Yoga Nidra + Sound Bath combo class. Barely offered in Mumbai studios.</p>
+  </div>
+
+  <div class="sec-label">Venues to Approach 📍</div>
+  <div class="venue-row">
+    <div class="venue-icon">🏨</div>
+    <div class="venue-info">
+      <h4>JW Marriott, Juhu <span class="badge badge-blue">High Value</span></h4>
+      <p>Spa has no resident yoga teacher. Weekend sound bath = ₹2,500–4,000/head potential.</p>
+    </div>
+  </div>
+  <div class="venue-row">
+    <div class="venue-icon">🏢</div>
+    <div class="venue-info">
+      <h4>Nykaa HQ, Andheri <span class="badge badge-green">Corporate</span></h4>
+      <p>200+ employees. No wellness program listed. 2×/week corporate yoga = ₹40–60K/month.</p>
+    </div>
+  </div>
+  <div class="venue-row">
+    <div class="venue-icon">🏡</div>
+    <div class="venue-info">
+      <h4>The Hive Co-working, BKC <span class="badge badge-orange">Growing</span></h4>
+      <p>Hosts wellness events. Lunch-break yoga sessions gap identified. Easy entry point.</p>
+    </div>
+  </div>
+  <div class="venue-row">
+    <div class="venue-icon">🌴</div>
+    <div class="venue-info">
+      <h4>Aamby Valley Resort <span class="badge badge-blue">Weekend Retreat</span></h4>
+      <p>2-hr drive from Mumbai. No yoga retreat offering. Sound Bath Retreat weekend = premium pricing.</p>
+    </div>
+  </div>
+
+  <div class="sec-label">Your Differentiation Edge ✨</div>
+  <div class="diff-card">
+    <div class="dc-tag">Gap in the Market</div>
+    <h3>Nobody combines Nada Yoga + Ayurvedic sequencing</h3>
+    <p>Most teachers offer either yoga OR sound healing. You can offer a <strong>complete system</strong> — asana curated by dosha, followed by nada therapy tuned to that dosha. No one in Mumbai is framing it this way.</p>
+  </div>
+  <div class="diff-card">
+    <div class="dc-tag">Pricing Opportunity</div>
+    <h3>Therapeutic Yoga is under-priced in India</h3>
+    <p>Psychosomatic condition-specific classes (anxiety, IBS, chronic pain) command 2–3× standard rates in London/NYC. Indian urban market is 18 months behind — get there first.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 6 — WISDOM
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-wisdom">
+
+  <div class="sec-label">Choose Your Text</div>
+  <div class="text-selector">
+    <button class="text-btn sel">Yoga Sutras</button>
+    <button class="text-btn">Bhagavad Gita</button>
+    <button class="text-btn">Upanishads</button>
+    <button class="text-btn">Hatha Yoga Pradipika</button>
+  </div>
+
+  <div class="shloka">
+    <div class="src">Patanjali Yoga Sutras · 1.2</div>
+    <div class="verse">योगश्चित्तवृत्तिनिरोधः</div>
+    <div class="trans">Yoga is the cessation of the fluctuations of the mind.</div>
+    <div class="interp">
+      <div class="interp-item">
+        <div class="interp-name">B.K.S. Iyengar</div>
+        <div class="interp-text">"The fluctuations of consciousness are controlled through practice and detachment. When the mind is still, the soul is revealed in its own light."</div>
+      </div>
+      <div class="interp-item">
+        <div class="interp-name">Sadhguru</div>
+        <div class="interp-text">"Yoga is not about controlling the mind — it is about becoming free of the compulsiveness of the mind. The moment you are not compelled, you are in yoga."</div>
+      </div>
+      <div class="interp-item">
+        <div class="interp-name">Osho</div>
+        <div class="interp-text">"The mind is like a lake. When there is no wind, it becomes a mirror — and in that mirror, the sky is reflected perfectly. That reflection is samadhi."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shloka">
+    <div class="src">Patanjali Yoga Sutras · 1.14</div>
+    <div class="verse">स तु दीर्घकालनैरन्तर्यसत्काराऽऽसेवितो दृढभूमिः</div>
+    <div class="trans">Practice becomes firmly grounded when it is pursued sincerely and without interruption over a long time.</div>
+    <div class="interp">
+      <div class="interp-item">
+        <div class="interp-name">Swami Vivekananda</div>
+        <div class="interp-text">"Long, uninterrupted, sincere practice is the only way. There are no shortcuts to the divine. Time, love, and consistency are the only currency."</div>
+      </div>
+      <div class="interp-item">
+        <div class="interp-name">Thich Nhat Hanh</div>
+        <div class="interp-text">"Each breath is the practice. Each step is the practice. The continuity is not in the hours spent, but in the quality of attention brought to each moment."</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="nav-tab active" onclick="showTab('schedule',this)">
+    <span class="ni">📅</span><span>Schedule</span>
+  </button>
+  <button class="nav-tab" onclick="showTab('attend',this)">
+    <span class="ni">✅</span><span>Attendance</span>
+  </button>
+  <button class="nav-tab" onclick="showTab('plan',this)">
+    <span class="ni">🧘</span><span>Class Plan</span>
+  </button>
+  <button class="nav-tab" onclick="showTab('tip',this)">
+    <span class="ni">🌿</span><span>Tip</span>
+  </button>
+  <button class="nav-tab" onclick="showTab('opp',this)">
+    <span class="ni">📡</span><span>Opportunity</span>
+  </button>
+  <button class="nav-tab" onclick="showTab('wisdom',this)">
+    <span class="ni">📖</span><span>Wisdom</span>
+  </button>
+</nav>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+document.querySelectorAll('.text-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.text-btn').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+  });
+});
+</script>
+</body>
+</html>

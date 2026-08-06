@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoga Sadhana — App Shell Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fdf6ee; color: #1c1207; }
+
+  /* ── Palette ── */
+  :root {
+    --saffron:   #e07b1a;
+    --turmeric:  #c9860d;
+    --gold:      #d4a017;
+    --forest:    #1e4d2b;
+    --moss:      #3a6b3e;
+    --sage:      #6b8f6b;
+    --cream:     #fdf6ee;
+    --bark:      #78350f;
+    --text:      #1c1207;
+    --muted:     #7c6a52;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    background: var(--forest);
+    color: var(--gold);
+    padding: 14px 18px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 2px solid var(--saffron);
+  }
+  .app-logo { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; }
+  .app-logo span { color: var(--saffron); }
+  .app-date { font-size: 0.75rem; color: var(--sage); }
+
+  /* ── Content ── */
+  .app-main { padding: 14px; padding-bottom: 80px; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--saffron);
+    box-shadow: 0 2px 10px rgba(28,18,7,0.07);
+  }
+  .card.green { border-left-color: var(--moss); }
+  .card.gold  { border-left-color: var(--gold); }
+
+  .card-tag {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--saffron); margin-bottom: 6px;
+  }
+  .card.green .card-tag { color: var(--moss); }
+  .card.gold  .card-tag { color: var(--turmeric); }
+
+  .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-size: 0.7rem; padding: 3px 10px; border-radius: 99px;
+    background: #fef3e2; color: var(--bark); font-weight: 600;
+    border: 1px solid #f5d6a0;
+  }
+  .chip.green { background: #e8f4eb; color: var(--forest); border-color: #b0d4b8; }
+
+  /* ── Pose card ── */
+  .pose-hero {
+    background: linear-gradient(145deg, var(--forest) 0%, var(--moss) 60%, var(--bark) 100%);
+    border-radius: 16px;
+    padding: 22px 18px;
+    margin-bottom: 14px;
+    color: var(--cream);
+    position: relative; overflow: hidden;
+  }
+  .pose-hero::after {
+    content: '🧘'; font-size: 5rem; opacity: 0.12;
+    position: absolute; right: -10px; bottom: -10px;
+  }
+  .pose-hero .pose-tag { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .pose-hero h2 { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+  .pose-hero .sanskrit { font-size: 0.85rem; color: var(--gold); font-style: italic; margin-bottom: 10px; }
+  .pose-hero p { font-size: 0.8rem; color: rgba(253,246,238,0.85); line-height: 1.5; }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--forest);
+    border-top: 2px solid var(--saffron);
+    display: flex; justify-content: space-around;
+    padding: 8px 4px 12px;
+    z-index: 10;
+  }
+  .nav-tab {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; background: none; border: none; cursor: pointer;
+    color: var(--sage); font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.4px; text-transform: uppercase;
+    padding: 4px 8px; border-radius: 10px;
+    transition: color 0.2s;
+  }
+  .nav-tab.active { color: var(--gold); }
+  .nav-tab .nav-icon { font-size: 1.35rem; }
+  .nav-tab.active .nav-icon { filter: drop-shadow(0 0 4px rgba(212,160,23,0.7)); }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted); margin: 18px 0 10px;
+  }
+
+  /* ── Trend mini-chart placeholder ── */
+  .trend-bar { display: flex; align-items: flex-end; gap: 5px; height: 60px; margin-top: 10px; }
+  .trend-bar span {
+    flex: 1; background: var(--moss); border-radius: 4px 4px 0 0; opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .trend-bar span.hi { background: var(--saffron); opacity: 1; }
+
+  /* ── Shloka card ── */
+  .shloka {
+    background: linear-gradient(135deg, #fffbf2, #fef6e4);
+    border: 1px solid #f0d9a0;
+    border-radius: 14px; padding: 18px;
+    margin-bottom: 14px;
+  }
+  .shloka .source { font-size: 0.65rem; color: var(--turmeric); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .shloka .verse { font-size: 1rem; color: var(--bark); font-weight: 600; line-height: 1.7; margin-bottom: 8px; font-style: italic; }
+  .shloka .meaning { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <span class="app-logo">🪷 <span>Yoga</span> Sadhana</span>
+  <span class="app-date">Wed, 29 Jul</span>
+</header>
+
+<main class="app-main">
+
+  <!-- ── TAB 1: Sadhana (Condition → Plan) ── -->
+  <div class="section-label">Today's Sadhana Plan</div>
+
+  <div class="card" style="background: linear-gradient(135deg,#fef8ee,#fff); border-left: none; border-top: 3px solid var(--saffron);">
+    <div class="card-tag">Your Condition</div>
+    <h3>Stress & Mental Fatigue 🧠</h3>
+    <p>Curated sequence for calming the nervous system, grounding vata, and restoring clarity.</p>
+    <div class="chips">
+      <span class="chip">Nadi Shodhana</span>
+      <span class="chip">Balasana</span>
+      <span class="chip">Shavasana</span>
+      <span class="chip green">Ashwagandha tea</span>
+      <span class="chip green">Sattvic diet</span>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="card-tag">Ayurvedic Tip</div>
+    <h3>Oil your scalp before sleep 🌿</h3>
+    <p>Brahmi oil massaged into the scalp for 5 min calms an overactive mind and promotes deep, dreamless sleep.</p>
+  </div>
+
+  <div class="card gold">
+    <div class="card-tag">Sattvic Recipe</div>
+    <h3>Moong Dal Khichdi</h3>
+    <p>Easy to digest, tridoshic. Add a pinch of turmeric, ghee, and rock salt. Best eaten at noon.</p>
+  </div>
+
+  <!-- ── TAB 2: Peak Pose (sample) ── -->
+  <div class="section-label">Peak Pose of the Day</div>
+
+  <div class="pose-hero">
+    <div class="pose-tag">🏔 Peak Pose · Intermediate</div>
+    <h2>Warrior III</h2>
+    <div class="sanskrit">Virabhadrasana III</div>
+    <p>Builds single-leg balance, core strength, and mental focus. Today's sequence builds toward it over 7 preparatory poses.</p>
+  </div>
+
+  <div class="card green">
+    <div class="card-tag">Sequence — 7 steps</div>
+    <h3>1 → Tadasana → Utkatasana → Warrior I → Warrior II → High Lunge → Warrior III</h3>
+    <p>Hold each for 5 breaths. Finish with Ardha Chandrasana as counter-pose.</p>
+  </div>
+
+  <!-- ── TAB 3: Trends (sample) ── -->
+  <div class="section-label">Yoga in the World 🌍</div>
+
+  <div class="card gold">
+    <div class="card-tag">Trend · Global Search Interest</div>
+    <h3>"Pranayama" searches up 42% in 2025</h3>
+    <p>Driven by South Asia, UK, and USA. Nadi Shodhana and Bhramari lead. Source: Google Trends.</p>
+    <div class="trend-bar">
+      <span style="height:30%"></span>
+      <span style="height:40%"></span>
+      <span style="height:45%"></span>
+      <span style="height:55%"></span>
+      <span style="height:60%"></span>
+      <span style="height:70%"></span>
+      <span style="height:65%"></span>
+      <span class="hi" style="height:100%"></span>
+    </div>
+  </div>
+
+  <!-- ── TAB 4: Wisdom (sample) ── -->
+  <div class="section-label">Wisdom from the Texts 📖</div>
+
+  <div class="shloka">
+    <div class="source">Patanjali Yoga Sutras · 1.2</div>
+    <div class="verse">योगश्चित्तवृत्तिनिरोधः</div>
+    <div class="meaning"><strong>Yoga is the cessation of the fluctuations of the mind.</strong><br>When the mind is still, the seer rests in their own true nature. All practice flows toward this one end.</div>
+  </div>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-tab active">
+    <span class="nav-icon">🪷</span>
+    <span>Sadhana</span>
+  </button>
+  <button class="nav-tab">
+    <span class="nav-icon">🏔</span>
+    <span>Peak Pose</span>
+  </button>
+  <button class="nav-tab">
+    <span class="nav-icon">🌍</span>
+    <span>Trends</span>
+  </button>
+  <button class="nav-tab">
+    <span class="nav-icon">📖</span>
+    <span>Wisdom</span>
+  </button>
+  <button class="nav-tab">
+    <span class="nav-icon">🔊</span>
+    <span>Sound</span>
+  </button>
+</nav>
+
+</body>
+</html>

@@ -92,7 +92,12 @@ function chipsHTML(chips) {
 }
 
 // ── Section Card helper ───────────────────────────────────
-function sectionCardHTML({ tag, headline, lede, body, upsc_angle, chips }) {
+function sectionCardHTML({ tag, headline, lede, body, upsc_angle, chips, explore_more }) {
+  const exploreHTML = (explore_more && explore_more.length) ? `
+    <div class="explore-more">
+      <span class="explore-more-label">🔗 Explore More</span>
+      ${explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+    </div>` : '';
   return `
     <div class="card">
       <div class="section-tag">${tag}</div>
@@ -104,6 +109,7 @@ function sectionCardHTML({ tag, headline, lede, body, upsc_angle, chips }) {
         <div class="upsc-angle-text">${upsc_angle}</div>
       </div>
       ${chipsHTML(chips)}
+      ${exploreHTML}
     </div>`;
 }
 
@@ -136,6 +142,12 @@ function renderWorldAffairs(waList) {
          </div>`
       : '';
 
+    const waExploreHTML = (wa.explore_more && wa.explore_more.length) ? `
+      <div class="explore-more">
+        <span class="explore-more-label">🔗 Explore More</span>
+        ${wa.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+      </div>` : '';
+
     return `<div class="card">
       <div class="section-tag">${wa.tag} ${idx > 0 ? `<span style="font-size:9px;color:var(--muted);font-weight:400;text-transform:none;">story ${idx+1}</span>` : ''}</div>
       <h2 class="card-headline">${wa.headline}</h2>
@@ -147,6 +159,7 @@ function renderWorldAffairs(waList) {
         <div class="upsc-angle-text">${wa.upsc_angle}</div>
       </div>
       ${chipsHTML(wa.chips)}
+      ${waExploreHTML}
       ${perspHTML}
     </div>`;
   }).join('');
@@ -227,6 +240,11 @@ function renderCulture(cuList) {
           <div class="dance-desc">${dance.desc}</div>
         </div>
       </div>` : '';
+    const cuExploreHTML = (cu.explore_more && cu.explore_more.length) ? `
+      <div class="explore-more">
+        <span class="explore-more-label">🔗 Explore More</span>
+        ${cu.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+      </div>` : '';
     return `<div class="card">
       <div class="section-tag">${cu.tag}</div>
       <h2 class="card-headline">${cu.headline}</h2>
@@ -237,6 +255,7 @@ function renderCulture(cuList) {
         <div class="upsc-angle-text">${cu.upsc_angle}</div>
       </div>
       ${chipsHTML(cu.chips)}
+      ${cuExploreHTML}
       ${danceHTML}
     </div>`;
   }).join('');
@@ -250,6 +269,11 @@ function renderPerson(peList) {
       <a class="wiki-link" href="${pe.wiki_url}" target="_blank" rel="noopener">
         📖 Read more on Wikipedia →
       </a>` : '';
+    const peExploreHTML = (pe.explore_more && pe.explore_more.length) ? `
+      <div class="explore-more">
+        <span class="explore-more-label">🔗 Explore More</span>
+        ${pe.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+      </div>` : '';
     return `<div class="card">
       <div class="section-tag">${pe.tag}</div>
       <h2 class="card-headline">${pe.headline}</h2>
@@ -261,6 +285,7 @@ function renderPerson(peList) {
       </div>
       ${chipsHTML(pe.chips)}
       ${wikiLink}
+      ${peExploreHTML}
     </div>`;
   }).join('');
 }
@@ -517,6 +542,12 @@ function renderTrade(trade) {
     `<span class="trade-dest-tag">${d}</span>`
   ).join('');
 
+  const featuredExploreHTML = (f.explore_more && f.explore_more.length) ? `
+    <div class="explore-more">
+      <span class="explore-more-label">🔗 Explore More</span>
+      ${f.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+    </div>` : '';
+
   const featuredHTML = `
     <div class="card">
       <div class="section-tag">📦 TODAY'S SPOTLIGHT</div>
@@ -531,6 +562,7 @@ function renderTrade(trade) {
         <div class="upsc-angle-text">${f.upsc_angle}</div>
       </div>
       ${chipsHTML(f.chips)}
+      ${featuredExploreHTML}
     </div>`;
 
   const exportItems = (trade.india_exports || []).map(item => tradeItemHTML(item)).join('');
@@ -563,6 +595,11 @@ function renderTrade(trade) {
         <div class="upsc-angle-text">${t.upsc_angle}</div>
       </div>
       ${chipsHTML(t.chips)}
+      ${(t.explore_more && t.explore_more.length) ? `
+      <div class="explore-more">
+        <span class="explore-more-label">🔗 Explore More</span>
+        ${t.explore_more.map(r => `<a class="explore-link" href="${r.url}" target="_blank" rel="noopener noreferrer">${r.label} ↗</a>`).join('')}
+      </div>` : ''}
     </div>`).join('')}` : '';
 
   // ── Investment Picks ──
